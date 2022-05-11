@@ -24,4 +24,4 @@ data:
   UseLoadTest: "False"
   UseFeatureManagement: "True"
   FeatureManagement__Coupons: "True"
-  #AppConfig__Endpoint: <connection-string>
+  AppConfig__Endpoint: "Endpoint=https://eshoplearn20200630195254680.azconfig.io;Id=<id>;Secret=<secret>" # TODO: replace with Key Vault reference
