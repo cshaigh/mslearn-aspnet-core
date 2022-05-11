@@ -15,10 +15,27 @@ namespace eShopOnContainers.WebSPA
             CreateHostBuilder(args).Build().RunAsync();
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
+            // Register default configuration providers
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                // Add the AddAzureAppConfiguration code
+
+                // Register a configuration provider for the Azure App Configuration store
+                .ConfigureAppConfiguration((_, configBuilder) =>
+                {
+                    var settings = configBuilder.Build();
+
+                    // Register configuration provider
+                    configBuilder.AddAzureAppConfiguration(configOptions =>
+                        configOptions
+
+                            // Authenticate to Azure App Configuration with AppConfig:Endpoint Connection String
+                            .Connect(settings["AppConfig:Endpoint"])
+
+                            // Enable feature flags support
+                            .UseFeatureFlags());
+                })
+
                 .ConfigureLogging((hostingContext, logBuilder) =>
                 {
                     logBuilder.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
