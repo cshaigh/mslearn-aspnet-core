@@ -25,15 +25,38 @@ namespace eShopOnContainers.WebSPA
                 {
                     var settings = configBuilder.Build();
 
-                    // Register configuration provider
-                    configBuilder.AddAzureAppConfiguration(configOptions =>
-                        configOptions
+                    if (settings.GetValue<bool>("UseFeatureManagement") &&
+                        !string.IsNullOrEmpty(settings["AppConfig:Endpoint"]))
+                    {
+                        // Register configuration provider
+                        configBuilder.AddAzureAppConfiguration(configOptions =>
+                        {
+                            var cacheTime = TimeSpan.FromSeconds(5);
 
-                            // Authenticate to Azure App Configuration with AppConfig:Endpoint Connection String
-                            .Connect(settings["AppConfig:Endpoint"])
+                            configOptions
 
-                            // Enable feature flags support
-                            .UseFeatureFlags());
+                                // Authenticate to Azure App Configuration with AppConfig:Endpoint Connection String (stored as AppConfig__Endpoint helm env variable)
+                                .Connect(settings["AppConfig:Endpoint"])
+
+                                // Enable feature flags support
+                                .UseFeatureFlags(flagOptions =>
+                                {
+                                    // Cache feature flags for cacheTime (5 seconds)
+                                    // NB: default cache expiry is 30 seconds
+                                    flagOptions.CacheExpirationInterval = cacheTime;
+                                })
+
+                                // Configure refresh options for specific App Configuration keys
+                                .ConfigureRefresh(refreshOptions =>
+                                {
+                                    // Cache FeatureManagement:Coupons feature flag key for cacheTime (5 seconds)
+                                    // NB: default cache expiry is 30 seconds, although perhaps earlier override for all feature flags (5 seconds) will be used?
+                                    refreshOptions
+                                        .Register("FeatureManagement:Coupons", refreshAll: true)
+                                        .SetCacheExpiration(cacheTime);
+                                });
+                        });
+                    }                    
                 })
 
                 .ConfigureLogging((hostingContext, logBuilder) =>
@@ -43,6 +66,7 @@ namespace eShopOnContainers.WebSPA
                     logBuilder.AddDebug();
                     logBuilder.AddAzureWebAppDiagnostics();
                 })
+
                 .UseSerilog((builderContext, config) =>
                 {
                     config

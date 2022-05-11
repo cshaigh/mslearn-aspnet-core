@@ -41,6 +41,7 @@ namespace eShopOnContainers.WebSPA
             if (Configuration.GetValue<bool>("UseFeatureManagement"))
             {
                 services.AddFeatureManagement();
+                services.AddAzureAppConfiguration();
             }
 
             services
@@ -81,7 +82,11 @@ namespace eShopOnContainers.WebSPA
                 app.UseDeveloperExceptionPage();
             }
 
-            // Add the UseAzureAppConfiguration code
+            // Add the App Configuration middleware to the request pipeline if UseFeatureManagement is true in config
+            if (Configuration.GetValue<bool>("UseFeatureManagement"))
+            {
+                app.UseAzureAppConfiguration();
+            }
 
             app.Use(next => context =>
             {
