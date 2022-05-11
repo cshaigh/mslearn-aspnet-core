@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.FeatureManagement;
+//using Microsoft.FeatureManagement;
 using StackExchange.Redis;
 using System;
 using WebSPA.Infrastructure;
@@ -38,11 +38,7 @@ namespace eShopOnContainers.WebSPA
 
         public void ConfigureServices(IServiceCollection services)
         {
-            if (Configuration.GetValue<bool>("UseFeatureManagement"))
-            {
-                services.AddFeatureManagement();
-                services.AddAzureAppConfiguration();
-            }
+            // Add the AddFeatureManagement code
 
             services
                 .AddHealthChecks()
@@ -82,11 +78,7 @@ namespace eShopOnContainers.WebSPA
                 app.UseDeveloperExceptionPage();
             }
 
-            // Add the App Configuration middleware to the request pipeline if UseFeatureManagement is true in config
-            if (Configuration.GetValue<bool>("UseFeatureManagement"))
-            {
-                app.UseAzureAppConfiguration();
-            }
+            // Add the UseAzureAppConfiguration code
 
             app.Use(next => context =>
             {
@@ -122,10 +114,7 @@ namespace eShopOnContainers.WebSPA
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                if (Configuration.GetValue<bool>("UseFeatureManagement"))
-                {
-                    endpoints.MapFeatureManagement();
-                }
+                // Add the MapFeatureManagement code
 
                 endpoints.MapControllerRoute(
                    name: "CouponStatus",

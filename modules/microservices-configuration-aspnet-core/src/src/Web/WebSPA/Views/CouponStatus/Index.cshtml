@@ -5,7 +5,7 @@
 }
 @using WebSPA.ViewModels;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@addTagHelper *, Microsoft.FeatureManagement.AspNetCore
+@* Add the addTagHelper directive *@
 
 <!DOCTYPE html>
 <html lang="en">
@@ -45,15 +45,7 @@
     </header>
 
     <div class="container">
-        @* Display this when Coupons feature flag is Enabled *@
-        <feature name="Coupons">
-            <partial name="_AvailableCoupons" model="allAvailableCoupons" />
-        </feature>
-
-        @* Display this when Coupons feature flag is Disabled *@
-        <feature name="Coupons" negate="true">
-            <div class="feature-heading-text-display">You're not subscribed to this feature.</div>
-        </feature>
+        <partial name="_AvailableCoupons" model="allAvailableCoupons" />
     </div>
     <footer class="footer">
         <div class="container">
